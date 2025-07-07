@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Repro WebAR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="icon" href="data:," />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    #marker-info {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      padding: 8px 12px;
+      font-size: 16px;
+      font-family: monospace;
+      z-index: 9999;
+      border-radius: 6px;
+    }
+  </style>
+
+  <!-- A-Frame & MindAR -->
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+  <!-- Tu JS -->
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <div id="cam-error">
+    🚫 No se pudo acceder a la cámara. Revisa los permisos en tu navegador.
+  </div>
+
+  <!-- HUD para ver qué marcador fue detectado -->
+  <div id="marker-info">Marcador: ---</div>
+
+  <a-scene
+    mindar-image="imageTargetSrc: assets/targets.mind"
+    embedded
+    color-space="sRGB"
+    renderer="antialias: true; alpha: true; physicallyCorrectLights: true"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: true"
+    shadow="type: pcfsoft"
+  >
+    <a-assets>
+      <template id="video-template">
+        <video
+          autoplay
+          loop
+          muted
+          playsinline
+          crossorigin="anonymous"
+          webkit-playsinline
+          style="display: none"
+        ></video>
+      </template>
+    </a-assets>
+
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+    <a-entity light="type: ambient; intensity: 0.5"></a-entity>
+    <a-entity light="type: point; intensity: 2; distance: 10; decay: 2; color: #ffddaa" position="0 2 2"></a-entity>
+  </a-scene>
+</body>
+</html>
