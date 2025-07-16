@@ -1,74 +1,100 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <title>JC WebAR</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#000000" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="icon" href="data:," />
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0"
+    />
+    <meta name="theme-color" content="#000000" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="screen-orientation" content="portrait" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Repro WebAR" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="HandheldFriendly" content="true" />
+    <meta name="apple-touch-fullscreen" content="yes" />
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="css/style.css" />
-  <style>
-    #marker-info {
+    <title>Repro WebAR</title>
+
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="stylesheet" href="/src/styles/style.css" />
+
+    <!-- ✅ A-Frame & MindAR -->
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+    <!-- ✅ App principal -->
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+
+  <body>
+    <!-- 🔘 Pantalla de inicio para desbloqueo por interacción -->
+    <div id="start-screen" style="
       position: fixed;
-      top: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.6);
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
       color: white;
-      padding: 8px 12px;
-      font-size: 16px;
-      font-family: monospace;
       z-index: 9999;
-      border-radius: 6px;
-    }
-  </style>
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    ">
+      <p style="margin-bottom: 1rem; font-size: 1.2rem;">🔓 Pulsa para iniciar WebAR</p>
+      <button id="start-button" style="padding: 1rem 2rem; font-size: 1rem;">Iniciar WebAR</button>
+    </div>
 
-  <!-- A-Frame & MindAR -->
-  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <!-- 🚨 Error de cámara -->
+    <div id="cam-error" style="display: none;">
+      🚫 No se pudo acceder a la cámara. Revisa los permisos.
+    </div>
 
-  <!-- Tu JS -->
-  <script src="js/app.js" defer></script>
-</head>
-<body>
-  <div id="cam-error">
-    🚫 No se pudo acceder a la cámara. Revisa los permisos en tu navegador.
-  </div>
+    <!-- ℹ️ Info del marcador -->
+    <div id="marker-info">Marcador: ---</div>
 
-  <!-- HUD para ver qué marcador fue detectado -->
-  <div id="marker-info">Marcador: ---</div>
+    <!-- 📷 Cámara previa (desbloqueada con botón) -->
+    <video
+      id="mindar-video"
+      autoplay
+      muted
+      playsinline
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        z-index: 0;
+        display: block;
+        opacity: 1;
+        pointer-events: none;
+      "
+    ></video>
 
-  <a-scene
-    mindar-image="imageTargetSrc: assets/targets.mind"
-    embedded
-    color-space="sRGB"
-    renderer="antialias: true; alpha: true; physicallyCorrectLights: true"
-    vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: false"
-    shadow="type: pcfsoft"
-  >
-    <a-assets>
-      <template id="video-template">
-        <video
-          autoplay
-          loop
-          muted
-          playsinline
-          crossorigin="anonymous"
-          webkit-playsinline
-          style="display: none"
-        ></video>
-      </template>
-    </a-assets>
+    <!-- 🌐 Escena WebAR -->
+    <a-scene
+      mindar-image="imageTargetSrc: assets/targets.mind; maxTrack: 22"
+      embedded
+      color-space="sRGB"
+      renderer="antialias: true; alpha: true"
+      device-orientation-permission-ui="enabled: true"
+    >
+      <!-- 🛠️ Debug -->
+      <a-entity debug-log></a-entity>
 
-    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      <!-- 🎥 Cámara de A-Frame -->
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-    <a-entity light="type: ambient; intensity: 0.5"></a-entity>
-    <a-entity light="type: point; intensity: 2; distance: 10; decay: 2; color: #ffddaa" position="0 2 2"></a-entity>
-  </a-scene>
-</body>
+      <!-- 💡 Luces -->
+      <a-entity light="type: ambient; intensity: 0.5"></a-entity>
+      <a-entity light="type: point; intensity: 2; distance: 10; decay: 2" position="0 2 2"></a-entity>
+    </a-scene>
+  </body>
 </html>
-
